@@ -32,6 +32,7 @@ public class WindowedFilenamePolicy extends FilenamePolicy {
             PaneInfo paneInfo,
             OutputFileHints outputFileHints) {
 		IntervalWindow intervalWindow = (IntervalWindow) window;
+		System.out.println("getMillis_test:" + window.TIMESTAMP_MAX_VALUE.getMillis());
 		String filename = String.format(
             "%s-%s-%s-of-%s.avro",
             "TrackingAd",
