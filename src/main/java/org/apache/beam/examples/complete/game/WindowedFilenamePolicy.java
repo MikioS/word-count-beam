@@ -40,10 +40,11 @@ public class WindowedFilenamePolicy extends FilenamePolicy {
             shardNumber,
             numShards
         );
+		System.out.println("getCurrentDirectory:" + prefix.getCurrentDirectory());
 		System.out.println("filename:" + filename);
-        String subDirectory = intervalWindow.end().toDateTime(DateTimeZone.forID("Asia/Tokyo")).toString(DateTimeFormat.forPattern("yyyy/MM/dd/HH"));
+     //   String subDirectory = intervalWindow.end().toDateTime(DateTimeZone.forID("Asia/Tokyo")).toString(DateTimeFormat.forPattern("yyyy/MM/dd/HH"));
         return prefix.getCurrentDirectory()
-                .resolve(subDirectory, ResolveOptions.StandardResolveOptions.RESOLVE_DIRECTORY)
+     //           .resolve(subDirectory, ResolveOptions.StandardResolveOptions.RESOLVE_DIRECTORY)
         		.resolve(filename, ResolveOptions.StandardResolveOptions.RESOLVE_FILE);
 	}
 
