@@ -32,11 +32,12 @@ public class WindowedFilenamePolicy extends FilenamePolicy {
             PaneInfo paneInfo,
             OutputFileHints outputFileHints) {
 		IntervalWindow intervalWindow = (IntervalWindow) window;
-		System.out.println("getMillis_test:" + window.TIMESTAMP_MAX_VALUE.getMillis());
 		String filename = String.format(
-            "%s-%s-%s-of-%s.avro",
+            "%s-%s-%s-%s-%s-of-%s.avro",
             "TrackingAd",
-            intervalWindow.end().toDateTime(DateTimeZone.forID("Asia/Tokyo")).toString(DateTimeFormat.forPattern("yyyy-MM-dd-HH-mm")),
+            intervalWindow.start().toDateTime(DateTimeZone.forID("Asia/Tokyo")).toString(DateTimeFormat.forPattern("yyyyMMdd-HHmmss")),
+            intervalWindow.end().toDateTime(DateTimeZone.forID("Asia/Tokyo")).toString(DateTimeFormat.forPattern("HHmmss")),
+            intervalWindow.hashCode(),
             shardNumber,
             numShards
         );

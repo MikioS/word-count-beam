@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Locale;
 
 import org.apache.avro.Schema;
+import org.apache.avro.generic.GenericRecord;
 import org.apache.beam.sdk.Pipeline;
 import org.apache.beam.sdk.coders.AvroCoder;
 import org.apache.beam.sdk.io.AvroIO;
@@ -61,7 +62,7 @@ public class TestPubsubToGcs {
         void setNumShards(Integer value);
     }
     
-    static class ParseTrackingAdFn extends DoFn<PubsubMessage, TrackingAdBQ> {
+    static class ParseTrackingAdFn extends DoFn<PubsubMessage, GenericRecord> {
         /**
 		 * 
 		 */
@@ -77,17 +78,104 @@ public class TestPubsubToGcs {
   //              ObjectMapper mapper = new ObjectMapper();
   //              TrackingAd trackingAd = mapper.readValue(json, TrackingAd.class);
    
-                AvroCoder<TrackingAd> coder = AvroCoder.of(TrackingAd.class);
-                TrackingAd trackingAd = CoderUtils.decodeFromByteArray(coder, pubsubMessage.getPayload());
-                TrackingAdBQ trackingAdbq = TrackingAdMap.TrackingAdToTrackingAdBQ(trackingAd);
+                AvroCoder<GenericRecord> coder = AvroCoder.of(GenericRecord.class,SCHEMA2);
+                GenericRecord trackingAd = CoderUtils.decodeFromByteArray(coder, pubsubMessage.getPayload());
+                //TrackingAdBQ trackingAdbq = TrackingAdMap.TrackingAdToTrackingAdBQ(trackingAd);
 
-                c.output(trackingAdbq);
+                c.output(trackingAd);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    
+    private static final String SCHEMA_STRING2 = "{\n" + 
+    		"  \"namespace\":\"tv.trk\",\n" + 
+    		"  \"type\":\"record\",\n" + 
+    		"  \"name\":\"tracking_ad\",\n" + 
+    		"  \"fields\":[\n" + 
+    		"    {\"name\":\"uuid\", \"type\":\"string\"},\n" + 
+    		"    {\"name\":\"time\", \"type\":\"string\"},\n" + 
+    		"    {\"name\":\"action_type\", \"type\":\"string\"},\n" + 
+    		"    {\"name\":\"platform\", \"type\":\"string\"},\n" + 
+    		"    {\"name\":\"client\",\n" + 
+    		"      \"type\":{\n" + 
+    		"        \"type\":\"record\",\n" + 
+    		"        \"name\":\"client\",\n" + 
+    		"        \"fields\":[\n" + 
+    		"          {\"name\":\"device_model\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"ad_id\", \"type\":\"string\", \"default\":\"\"},\n" + 
+    		"          {\"name\":\"os\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"os_version\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"ip\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"useragent\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"app_version\", \"type\":\"string\"}\n" + 
+    		"        ]\n" + 
+    		"      }\n" + 
+    		"    },\n" + 
+    		"    {\"name\":\"page\",\n" + 
+    		"      \"type\":{\n" + 
+    		"        \"type\":\"record\",\n" + 
+    		"        \"name\":\"page\",\n" + 
+    		"        \"fields\":[\n" + 
+    		"          {\"name\":\"url\", \"type\":\"string\", \"default\":\"\"}\n" + 
+    		"        ]\n" + 
+    		"      }\n" + 
+    		"    },\n" + 
+    		"    {\"name\":\"user\",\n" + 
+    		"      \"type\":{\n" + 
+    		"        \"type\":\"record\",\n" + 
+    		"        \"name\":\"user\",\n" + 
+    		"        \"fields\":[\n" + 
+    		"          {\"name\":\"service_user_id\", \"type\":\"string\"}\n" + 
+    		"        ]\n" + 
+    		"      }\n" + 
+    		"    },\n" + 
+    		"    {\"name\":\"contents\",\n" + 
+    		"      \"type\":{\n" + 
+    		"        \"type\":\"record\",\n" + 
+    		"        \"name\":\"contents\",\n" + 
+    		"        \"fields\":[\n" + 
+    		"          {\"name\":\"log_type\", \"type\":\"int\"},\n" + 
+    		"          {\"name\":\"tracking_timing\", \"type\":\"int\"},\n" + 
+    		"          {\"name\":\"cue_point_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"cluster_cf_id\", \"type\":\"int\", \"default\":0},\n" + 
+    		"          {\"name\":\"cluster_id\", \"type\":\"int\", \"default\":0},\n" + 
+    		"          {\"name\":\"cue_point_sequence\", \"type\":\"int\"},\n" + 
+    		"          {\"name\":\"inserted_second\", \"type\":\"int\"},\n" + 
+    		"          {\"name\":\"inserted_start_datetime\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"inserted_end_datetime\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"slot_id\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"channel_id\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"program_id\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"content_provider_id\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"placement_method\", \"type\":\"long\", \"default\":0},\n" + 
+    		"          {\"name\":\"placement_job_id\", \"type\":\"string\", \"default\":\"\"},\n" + 
+    		"          {\"name\":\"token_id\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"account_id\", \"type\": \"long\"},\n" + 
+    		"          {\"name\":\"account_type\", \"type\":\"int\"},\n" + 
+    		"          {\"name\":\"campaign_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"ad_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"creative_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"creative_asset_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"agency_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"advertiser_brand_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"business_id\", \"type\":\"long\"},\n" + 
+    		"          {\"name\":\"appeal_id\", \"type\":\"long\", \"default\":0},\n" + 
+    		"          {\"name\":\"goal_id\", \"type\":\"long\", \"default\":0},\n" + 
+    		"          {\"name\":\"segment_group_id\", \"type\":\"string\", \"default\":\"\"},\n" + 
+    		"          {\"name\":\"portrait\", \"type\":\"boolean\"},\n" + 
+    		"          {\"name\":\"background_cluster_cf_id\", \"type\":\"int\", \"default\":0},\n" + 
+    		"          {\"name\":\"failed_times\", \"type\":\"int\", \"default\":0},\n" + 
+    		"          {\"name\":\"position\", \"type\":\"int\", \"default\":-1},\n" + 
+    		"          {\"name\":\"cm_code\", \"type\":\"string\"},\n" + 
+    		"          {\"name\":\"promo_type\", \"type\":\"int\", \"default\":-1}\n" + 
+    		"        ]\n" + 
+    		"      }\n" + 
+    		"    }\n" + 
+    		"  ]\n" + 
+    		"}";
     private static final String SCHEMA_STRING = "{\"type\":\"record\",\"name\":\"TrackingAdBQ\",\"namespace\":\"org.apache.beam.examples.complete.game\",\"fields\":[{\"name\":\"uuid\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"time\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"user_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"client_ad_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"os\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"ip\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"log_type\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"tracking_timing\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"cue_point_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"cluster_cf_id\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"cluster_id\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"segment_group_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"cue_point_sequence\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"inserted_second\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"inserted_start_datetime\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"inserted_end_datetime\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"slot_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"channel_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"program_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"content_provider_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"placement_method\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"placement_job_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"token_id\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"account_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"account_type\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"campaign_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"ad_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"creative_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"creative_asset_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"agency_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"advertiser_brand_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"business_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"appeal_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"goal_id\",\"type\":[\"null\",\"long\"],\"default\":null},{\"name\":\"cm_code\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"promo_type\",\"type\":[\"null\",\"int\"],\"default\":null},{\"name\":\"platform\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"device_model\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"os_version\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"app_version\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"useragent\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"url\",\"type\":[\"null\",\"string\"],\"default\":null},{\"name\":\"portrait\",\"type\":[\"null\",\"boolean\"],\"default\":null},{\"name\":\"position\",\"type\":[\"null\",\"int\"],\"default\":null}]}";
 /*    		
     	     "{\"namespace\": \"trackingad.avro\",\n"
@@ -141,9 +229,10 @@ public class TestPubsubToGcs {
               + " ]\n"
               + "}";     
 */
-    private static final Schema SCHEMA = new Schema.Parser().parse(SCHEMA_STRING);
+   // private static final Schema SCHEMA = new Schema.Parser().parse(SCHEMA_STRING);
+    private static final Schema SCHEMA2 = new Schema.Parser().parse(SCHEMA_STRING2);
     
-    static class AvroDestination extends DynamicAvroDestinations<PubsubMessage,String,TrackingAdBQ>{
+    static class AvroDestination extends DynamicAvroDestinations<PubsubMessage,String,GenericRecord>{
     	/**
 		 * 
 		 */
@@ -159,35 +248,42 @@ public class TestPubsubToGcs {
 		@Override
 		public Schema getSchema(String destination) {
             System.out.println("getSchema:destination:" + destination );
-		     return SCHEMA;
+		     return SCHEMA2;
 		}
 
 		@Override
-		public TrackingAdBQ formatRecord(PubsubMessage record) {
-            System.out.println("formatRecord");
+		public GenericRecord formatRecord(PubsubMessage record) {
+            System.out.println("formatRecord:start");
 
 			TrackingAdBQ trackingAdbq = null;
+			GenericRecord trackingAd = null;
+        	PubsubMessage pubsubMessage = record;
 			try {
-                System.out.println("formatRecord");
-            	
-            	PubsubMessage pubsubMessage = record;
+//            	PubsubMessage pubsubMessage = record;
 //            	String json = new String(pubsubMessage.getPayload(), "UTF-8");
 //                System.out.println("formatRecord:json:" + json);
 //                ObjectMapper mapper = new ObjectMapper();
 //                TrackingAd trackingAd = mapper.readValue(json, TrackingAd.class);
-                AvroCoder<TrackingAd> coder = AvroCoder.of(TrackingAd.class);
-                TrackingAd trackingAd = CoderUtils.decodeFromByteArray(coder, pubsubMessage.getPayload());
-                trackingAdbq = TrackingAdMap.TrackingAdToTrackingAdBQ(trackingAd);
+                AvroCoder<GenericRecord> coder = AvroCoder.of(GenericRecord.class,SCHEMA2);
+                 trackingAd = CoderUtils.decodeFromByteArray(coder, pubsubMessage.getPayload());
+//                System.out.println("formatRecord:trackingAd.uuid:" + trackingAd.uuid);
+
+//                trackingAdbq = TrackingAdMap.TrackingAdToTrackingAdBQ(trackingAd);
                 
-                System.out.println("formatRecord:trackingAdbq.uuid:" + trackingAdbq.uuid);
+  //              System.out.println("formatRecord:trackingAdbq.uuid:" + trackingAdbq.uuid);
                 
                 
             } catch (IOException e) {
                 System.out.println("formatRecord:IOException");
 
                 e.printStackTrace();
+            } catch (Exception e) {
+            	System.out.println("formatRecord:Exception");
+
+            	e.printStackTrace();	
             }
-			return trackingAdbq;
+            System.out.println("formatRecord:end");
+			return trackingAd;
 		}
 
 		@Override
@@ -216,8 +312,7 @@ public class TestPubsubToGcs {
 
     }
 
-    @SuppressWarnings("deprecation")
-	public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
         ReadDataOptions options = PipelineOptionsFactory.fromArgs(args).withValidation()
       .as(ReadDataOptions.class);
         
@@ -230,12 +325,13 @@ public class TestPubsubToGcs {
                 .withIdAttribute("ph")
 //                .withTimestampAttribute("ph")
                 .fromSubscription(options.getTopicSubscript()));
-        
+/*
+		
         PCollection<PubsubMessage> windowed_items = PubsubReadCollection
           .apply(options.getWindowDuration() + " Watermark Window",
               Window.<PubsubMessage>
                  into(FixedWindows.of(parseDuration(options.getWindowDuration())))
-                 
+  */               
                  
        //         .triggering(
        //         		AfterWatermark.pastEndOfWindow()
@@ -245,9 +341,9 @@ public class TestPubsubToGcs {
        //        			)
        //         .discardingFiredPanes()
        //   		.withAllowedLateness(Duration.standardHours(1))
-          		);
+  //        		);
         
-//        PCollection<TrackingAdBQ> PubsubtransformData = windowed_items		
+//        PCollection<GenericRecord> PubsubtransformData = windowed_items		
 //                .apply("ParseTrackingAd", ParDo.of(new ParseTrackingAdFn()));
 /*
          .apply("WriteText", TextIO.<PubsubMessage>writeCustomType().to(new AvroDestination(options.getOutput()))
@@ -256,25 +352,26 @@ public class TestPubsubToGcs {
                       FileSystems.matchNewResource(options.getOutput(), true)))
       		.withNumShards(options.getNumShards())
       		);
-
-        PubsubtransformData.apply("WriteAvros", AvroIO.write(TrackingAdBQ.class).to(options.getOutput())
-                .withSchema(SCHEMA)
+*/
+/*		
+        windowed_items.apply("WriteAvros", AvroIO.<PubsubMessage>writeCustomTypeToGenericRecords().to(options.getOutput())
+                .withSchema(SCHEMA2)
                 .withWindowedWrites()
                 .withTempDirectory(StaticValueProvider.of(
                         FileSystems.matchNewResource(options.getOutput(), true)))
         		.withNumShards(options.getNumShards())
         		);
 */
-
+/*
         windowed_items
-        .apply("WriteAvros", AvroIO.<PubsubMessage,TrackingAdBQ>writeCustomType().to(new AvroDestination(options.getOutput()))
-                .withSchema(SCHEMA)
+        .apply("WriteAvros", AvroIO.<PubsubMessage>writeCustomTypeToGenericRecords().to(new AvroDestination(options.getOutput()))
+                .withSchema(SCHEMA2)
                 .withWindowedWrites()
                 .withTempDirectory(StaticValueProvider.of(
                         FileSystems.matchNewResource(options.getOutput(), true)))
         		.withNumShards(options.getNumShards())
         		);
-    
+ */   
         pipeline.run();
     }
 
