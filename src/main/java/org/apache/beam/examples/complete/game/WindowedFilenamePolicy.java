@@ -10,6 +10,8 @@ import org.apache.beam.sdk.transforms.windowing.PaneInfo;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
+import java.util.UUID;
+
 
 public class WindowedFilenamePolicy extends FilenamePolicy {
     private final ResourceId prefix;
@@ -32,14 +34,15 @@ public class WindowedFilenamePolicy extends FilenamePolicy {
             PaneInfo paneInfo,
             OutputFileHints outputFileHints) {
 		IntervalWindow intervalWindow = (IntervalWindow) window;
+		UUID uuid = UUID.randomUUID();
 		String filename = String.format(
-            "%s-%s-%s-%s-%s-of-%s.avro",
+            "%s-%s-%s-%s-of-%s-%s.avro",
             "TrackingAd",
             intervalWindow.start().toDateTime(DateTimeZone.forID("Asia/Tokyo")).toString(DateTimeFormat.forPattern("yyyyMMdd-HHmmss")),
             intervalWindow.end().toDateTime(DateTimeZone.forID("Asia/Tokyo")).toString(DateTimeFormat.forPattern("HHmmss")),
-            intervalWindow.hashCode(),
             shardNumber,
-            numShards
+            numShards,
+            uuid.toString()
         );
 		System.out.println("getCurrentDirectory:" + prefix.getCurrentDirectory());
 		System.out.println("filename:" + filename);
