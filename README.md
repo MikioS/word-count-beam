@@ -9,6 +9,8 @@ vaga-load
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.PubsubToGcs \
      -Dexec.args="--runner=DataflowRunner \
                   --project=vega-load \
+                  --jobName=vega-pubsubtogcs-20180523 \
+                  --labels='{\"env\": \"vega\"}' \
                   --region=asia-east1 \
                   --numWorkers=10 \
                   --windowDuration=5s \
@@ -24,8 +26,8 @@ dev環境
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.PubsubToGcs \
      -Dexec.args="--runner=DataflowRunner \
                   --project=vega-177606 \
-			   --jobName=dev-pubsubtogcs-20180523 \
-			   --labels='{\"env\": \"dev\"}' \
+                  --jobName=dev-pubsubtogcs-20180523 \
+                  --labels='{\"env\": \"dev\"}' \
                   --region=asia-east1 \
                   --numWorkers=1 \
                   --windowDuration=10s \
@@ -42,8 +44,8 @@ stg環境
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.PubsubToGcs \
      -Dexec.args="--runner=DataflowRunner \
                   --project=vega-177606 \
-			   --jobName=stg-pubsubtogcs-20180523 \
-			   --labels='{\"env\": \"stg\"}' \
+                  --jobName=stg-pubsubtogcs-20180523 \
+                  --labels='{\"env\": \"stg\"}' \
                   --region=asia-east1 \
                   --numWorkers=1 \
                   --windowDuration=10s \
@@ -59,8 +61,8 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.Pu
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.PubsubToGcs \
      -Dexec.args="--runner=DataflowRunner \
                   --project=vega-177606 \
-			   --jobName=prd-pubsubtogcs-20180523 \
-			   --labels='{\"env\": \"prd\"}' \
+                  --jobName=prd-pubsubtogcs-20180523 \
+                  --labels='{\"env\": \"prd\"}' \
                   --region=asia-east1 \
                   --numWorkers=10 \
                   --windowDuration=5s \
