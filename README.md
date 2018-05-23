@@ -18,12 +18,32 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.Pu
                   --topicSubscript=projects/vega-load/subscriptions/load-to-gcs-tracking-ad" -Pdataflow-runner
 ```
 
+dev環境
+
+```
+mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.PubsubToGcs \
+     -Dexec.args="--runner=DataflowRunner \
+                  --project=vega-177606 \
+			   --jobName=dev-pubsubtogcs-20180523 \
+			   --labels='{\"env\": \"dev\"}' \
+                  --region=asia-east1 \
+                  --numWorkers=1 \
+                  --windowDuration=10s \
+                  --numShards=2 \
+                  --workerMachineType=n1-standard-8 \
+                  --output=gs://ito_test_001/dev-to-gcs-tracking-ad/ \
+                  --topicSubscript=projects/vega-177606/subscriptions/dev-test-ito-pubsub-to-gcs" -Pdataflow-runner
+```
+
+
 stg環境
 
 ```
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.PubsubToGcs \
      -Dexec.args="--runner=DataflowRunner \
                   --project=vega-177606 \
+			   --jobName=stg-pubsubtogcs-20180523 \
+			   --labels='{\"env\": \"stg\"}' \
                   --region=asia-east1 \
                   --numWorkers=1 \
                   --windowDuration=10s \
@@ -39,6 +59,8 @@ mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.Pu
 mvn compile exec:java -Dexec.mainClass=org.apache.beam.examples.complete.game.PubsubToGcs \
      -Dexec.args="--runner=DataflowRunner \
                   --project=vega-177606 \
+			   --jobName=prd-pubsubtogcs-20180523 \
+			   --labels='{\"env\": \"prd\"}' \
                   --region=asia-east1 \
                   --numWorkers=10 \
                   --windowDuration=5s \
