@@ -27,6 +27,7 @@ org/apache/beam/examples/PubsubWordCount$MyFormatFunction.class
 org/apache/beam/examples/WindowedWordCount$DefaultToCurrentSystemTime.class
 org/apache/beam/examples/complete/game/UserScore.class
 org/apache/beam/examples/complete/game/utils/WriteToText$PerWindowFiles.class
+org/apache/beam/examples/complete/game/PubsubToGcs.class
 org/apache/beam/examples/WordCount$WordCountOptions.class
 org/apache/beam/examples/common/ExampleUtils.class
 org/apache/beam/examples/complete/game/utils/WriteToText$FieldFn.class
@@ -61,6 +62,7 @@ org/apache/beam/examples/DebuggingWordCount$FilterTextFn.class
 org/apache/beam/examples/complete/game/StatefulTeamScore.class
 org/apache/beam/examples/WindowedWordCount$AddTimestampFn.class
 org/apache/beam/examples/complete/game/GameStats$Options.class
+org/apache/beam/examples/complete/game/PubsubToGcs$ReadDataOptions.class
 org/apache/beam/examples/complete/game/GameStats$CalculateSpammyUsers$1.class
 org/apache/beam/examples/complete/game/StatefulTeamScore$Options.class
 org/apache/beam/examples/complete/game/utils/GameConstants.class
